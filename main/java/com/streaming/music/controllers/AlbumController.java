@@ -31,26 +31,6 @@ public class AlbumController {
 
     @Value("${upload.path.album}")
     private String uploadPath;
-
-//    @PostMapping("/album")
-//    public ResponseEntity<Object> createAlbum(@RequestParam("json") String data, @RequestParam("file") MultipartFile file)throws IOException {
-//        GsonBuilder builder = new GsonBuilder();
-//        builder.setPrettyPrinting();
-//        Gson gson = builder.create();
-//        AlbumData albumData = gson.fromJson(data, AlbumData.class);
-//        AlbumData a = new AlbumData();
-//        try{
-//            String resultFilename =albumService.savePicture(file);
-//            a.setPathToAvatar(uploadPath + "/" + resultFilename);
-//        }catch (IOException exx){
-//            return ResponseEntity.badRequest().body(exx.getMessage());
-//        }
-//        a.setDescriptionText(albumData.getDescriptionText());
-//        a.setDateOfCreate(albumData.getDateOfCreate());
-//        a.setNameOfAlbum(albumData.getNameOfAlbum());
-//        return ResponseEntity.ok().body(albumService.saveAlbum(a));
-//    }
-
     @PostMapping("/album")
     public ResponseEntity<Object> createAlbum(@RequestParam("json") String data, @RequestParam("file") MultipartFile file) throws IOException, InvalidDataException, UnsupportedTagException {
         GsonBuilder builder = new GsonBuilder();
@@ -76,7 +56,7 @@ public class AlbumController {
         try{
             albumData = albumService.getAlbumById(id);
         }catch (EntityNotFoundException e){
-            ResponseEntity.ok().body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
         return ResponseEntity.ok().body(albumData);
     }

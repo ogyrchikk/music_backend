@@ -42,6 +42,7 @@ public class MainPlaylistService implements PlaylistService{
 
     @Override
     public int deleteById(int id) {
+        playlistRepository.getPlaylistById(id).orElseThrow(()->new EntityNotFoundException("Playlist not found"));
         playlistRepository.deleteById(id);
         return  1;
     }
@@ -80,7 +81,6 @@ public class MainPlaylistService implements PlaylistService{
         playlistData.setNameOfPlaylist(playlist.getNameOfPlaylist());
         playlistData.setDescriptionText(playlist.getDescriptionText());
         playlistData.setId(playlist.getId());
-        System.out.println(playlistData.getId());
         return playlistData;
     }
 
@@ -115,7 +115,7 @@ public class MainPlaylistService implements PlaylistService{
 
     @Override
     public List<PlaylistData> getAllByUser(String login) {
-        User user = userRepository.getUserByLogin(login).orElseThrow();
+        User user = userRepository.getUserByLogin(login).orElseThrow(()-> new EntityNotFoundException("User not found"));
         List<Playlist> playlists = playlistRepository.getAllByUser(user);
         List<PlaylistData> playlistData = new ArrayList<>();
         for (Playlist w:playlists) {
@@ -126,7 +126,7 @@ public class MainPlaylistService implements PlaylistService{
 
     @Override
     public int addPlaylistToUser(int idPlaylist, String loginUser) {
-        User user= userRepository.getUserByLogin(loginUser).orElseThrow();
+        User user= userRepository.getUserByLogin(loginUser).orElseThrow(()-> new EntityNotFoundException("User not found"));
         List<Playlist> playlists= playlistRepository.getAllByUser(user);
         playlists.add(playlistRepository.getById(idPlaylist));
         user.setPlaylists((List<Playlist>) playlists);

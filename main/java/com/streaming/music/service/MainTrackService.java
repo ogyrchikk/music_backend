@@ -183,7 +183,7 @@ public class MainTrackService implements TrackService{
     @Override
     public List<TrackData> getAllByTrackOfAlbum(int id) {
         List<TrackData> trackData = new ArrayList<>();
-        List<Track> tracks =trackRepository.getAllByTrackOfAlbum(albumRepository.getAlbumById(id));
+        List<Track> tracks =trackRepository.getAllByTrackOfAlbum(albumRepository.getAlbumById(id).orElseThrow(()-> new EntityNotFoundException("Album not found")));
         for (Track w:tracks) {
             trackData.add(populateTrackData(w));
         }
@@ -239,6 +239,4 @@ public class MainTrackService implements TrackService{
         userRepository.save(user);
         return 1;
     }
-
-
 }

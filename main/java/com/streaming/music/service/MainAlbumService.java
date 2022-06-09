@@ -62,14 +62,14 @@ public class MainAlbumService implements AlbumService{
 
     @Override
     public int deleteAlbumById(Integer id) {
-        trackRepository.deleteAllByTrackOfAlbum(albumRepository.getAlbumById(id));
-        log.info("Removed album "+ albumRepository.getAlbumById(id).getNameOfAlbum());
+        trackRepository.deleteAllByTrackOfAlbum(albumRepository.getAlbumById(id).orElseThrow(()-> new EntityNotFoundException("Album not found")));
+        log.info("Removed album "+ albumRepository.getAlbumById(id).orElseThrow(()-> new EntityNotFoundException("Album not found")).getNameOfAlbum());
         return albumRepository.deleteAlbumById(id).orElseThrow(()->new EntityNotFoundException("Album not found"));
     }
 
     @Override
     public AlbumData getAlbumById(Integer id) {
-        return populateAlbumData(albumRepository.getAlbumById(id));
+        return populateAlbumData(albumRepository.getAlbumById(id).orElseThrow(()-> new EntityNotFoundException("Album not found")));
     }
 
     @Override
@@ -131,7 +131,7 @@ public class MainAlbumService implements AlbumService{
                 TrackData t = new TrackData();
                 t.setPathToTrack(newFile.getPath());
                 t.setNameOfTrack(newFile.getName().substring(0, newFile.getName().length() - 4));
-                t.setGenre(albumRepository.getAlbumById(idAlbum).getGenre());
+                t.setGenre(albumRepository.getAlbumById(idAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found")).getGenre());
                 TrackData track = trackService.addTrack(t);
                 addTrackToAlbum(idAlbum,track.getId());
             }
@@ -183,7 +183,7 @@ public class MainAlbumService implements AlbumService{
     private Album populateAlbumEntity(AlbumData albumData){
         Album album;
         try{
-            album = albumRepository.getAlbumById(albumData.getId());
+            album = albumRepository.getAlbumById(albumData.getId()).orElseThrow(()->new EntityNotFoundException("Album not found"));
             album.setNameOfAlbum(albumData.getNameOfAlbum());
             album.setDateOfCreate(albumData.getDateOfCreate());
             album.setDescriptionText(albumData.getDescriptionText());
@@ -209,7 +209,7 @@ public class MainAlbumService implements AlbumService{
 
     @Override
     public int addTrackToAlbum(int idOfOAlbum, int... idOftrack) {
-        Album album = albumRepository.getById(idOfOAlbum);
+        Album album = albumRepository.getById(idOfOAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found"));
         List<Track> list = trackRepository.getAllByTrackOfAlbum(album);
         for (int id:idOftrack) {
             list.add(trackRepository.getTrackById(id));
@@ -222,7 +222,7 @@ public class MainAlbumService implements AlbumService{
 
     @Override
     public int removeTrackOfAlbum(int idOfOAlbum, int... idOftrack){
-        Album album = albumRepository.getById(idOfOAlbum);
+        Album album = albumRepository.getById(idOfOAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found"));
         List<Track> list = trackRepository.getAllByTrackOfAlbum(album);
         for (int id:idOftrack) {
             list.remove(trackRepository.getTrackById(id));
@@ -237,7 +237,7 @@ public class MainAlbumService implements AlbumService{
     @Override
     public List<AlbumData> getAlbumByExecutor(int id) {
         List<AlbumData> albumData = new ArrayList<>();
-        List<Album> albums = albumRepository.getAllByAlbumsOFExecutor(executorRepository.getById(id));
+        List<Album> albums = albumRepository.getAllByAlbumsOFExecutor(executorRepository.getById(id)).orElseThrow(()-> new EntityNotFoundException("Albums not found"));
         for (Album w:albums) {
             albumData.add(populateAlbumData(w));
         }
@@ -257,8 +257,8 @@ public class MainAlbumService implements AlbumService{
 
     @Override
     public int addAlbumToUser(int idAlbum, int idUser) {
-        Album album =albumRepository.getAlbumById(idAlbum);
-        List<User> users =userRepository.getAllByUsersAlbums(album);
+        Album album =albumRepository.getAlbumById(idAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found"));
+        List<User> users =userRepository.getAllByUsersAlbums(album).orElseThrow(()-> new EntityNotFoundException("Users not found"));
         users.add(userRepository.getById(idUser));
         album.setUsersAlbums(users);
         albumRepository.save(album);
@@ -267,8 +267,8 @@ public class MainAlbumService implements AlbumService{
 
     @Override
     public int removeAlbumFromUser(int idAlbum, int idUser) {
-        Album album =albumRepository.getAlbumById(idAlbum);
-        List<User> users =userRepository.getAllByUsersAlbums(album);
+        Album album =albumRepository.getAlbumById(idAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found"));
+        List<User> users =userRepository.getAllByUsersAlbums(album).orElseThrow(()-> new EntityNotFoundException("Users not found"));
         users.remove(userRepository.getById(idUser));
         album.setUsersAlbums(users);
         albumRepository.save(album);
@@ -277,10 +277,10 @@ public class MainAlbumService implements AlbumService{
 
     @Override
     public int addAlbumToExecutor(int idAlbum, int idOfExecutor) {
-        Album album=albumRepository.getAlbumById(idAlbum);
-        List<Executor> executors = executorRepository.getAllByExecutorsAlbums(albumRepository.getAlbumById(idAlbum));
+        Album album=albumRepository.getAlbumById(idAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found"));
+        List<Executor> executors = executorRepository.getAllByExecutorsAlbums(albumRepository.getAlbumById(idAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found")));
         executors.add(executorRepository.getById(idOfExecutor));
-        List<Track> tracks = trackRepository.getAllByTrackOfAlbum(albumRepository.getAlbumById(idAlbum));
+        List<Track> tracks = trackRepository.getAllByTrackOfAlbum(albumRepository.getAlbumById(idAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found")));
         for(Track t:tracks){
             trackService.addTrackToExecutor(t.getId(),idOfExecutor);
         }
@@ -291,10 +291,10 @@ public class MainAlbumService implements AlbumService{
 
     @Override
     public int removeAlbumFromExecutor(int idAlbum, int idOfExecutor) {
-        Album album=albumRepository.getAlbumById(idAlbum);
-        List<Executor> executors = executorRepository.getAllByExecutorsAlbums(albumRepository.getAlbumById(idAlbum));
+        Album album=albumRepository.getAlbumById(idAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found"));
+        List<Executor> executors = executorRepository.getAllByExecutorsAlbums(albumRepository.getAlbumById(idAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found")));
         executors.remove(executorRepository.getById(idOfExecutor));
-        List<Track> tracks = trackRepository.getAllByTrackOfAlbum(albumRepository.getAlbumById(idAlbum));
+        List<Track> tracks = trackRepository.getAllByTrackOfAlbum(albumRepository.getAlbumById(idAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found")));
         for(Track t:tracks){
             trackService.removeTrackFromExecutor(t.getId(),idOfExecutor);
         }

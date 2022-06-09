@@ -10,8 +10,6 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     Optional<Integer> deleteByLogin(String login);
     Optional<User> findByHashOfPasswordAndLogin(String hashOfPassword, String sold);
     Optional<User> getUserByLogin(String login);
-    List<User> getAllByPlaylists(Playlist playlist);
-    List<User> getAllByTracks(Track track);
-    List<User> getAllByUsersExecutors(Executor executor);
-    List<User> getAllByUsersAlbums(Album album);
+    Optional<List<User>> getAllByUsersExecutors(Executor executor);
+    Optional<List<User>> getAllByUsersAlbums(Album album);
 }

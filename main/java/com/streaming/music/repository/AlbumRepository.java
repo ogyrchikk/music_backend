@@ -11,12 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AlbumRepository extends JpaRepository<Album, Integer> {
-    Album getAlbumById(int id);
+    Optional<Album> getAlbumById(int id);
     Optional<Album> getAlbumByNameOfAlbum(String name);
     Optional<Integer> deleteAlbumById(int id);
-    List<Album> getAllByAlbumsOFExecutor(Executor executor);
-
-    List<Album> getAllByUsersAlbums(User user);
-
-
+    Optional<List<Album>> getAllByAlbumsOFExecutor(Executor executor);
+    Optional<Album> getById(int id);
 }

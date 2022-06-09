@@ -71,7 +71,7 @@ public class MainExecutorService implements ExecutorService  {
     @Override
     public int addExecutorToUser(int idExecutor, int idUser) {
         Executor executor = executorRepository.getById(idExecutor);
-        List<User> users = userRepository.getAllByUsersExecutors(executor);
+        List<User> users = userRepository.getAllByUsersExecutors(executor).orElseThrow(()-> new EntityNotFoundException("Users not found"));
         users.add(userRepository.getById(idUser));
         executor.setUsersExecutors(users);
         executorRepository.save(executor);
@@ -81,7 +81,7 @@ public class MainExecutorService implements ExecutorService  {
     @Override
     public int removeExecutorFromUser(int idExecutor, int idUser) {
         Executor executor = executorRepository.getById(idExecutor);
-        List<User> users = userRepository.getAllByUsersExecutors(executor);
+        List<User> users = userRepository.getAllByUsersExecutors(executor).orElseThrow(()-> new EntityNotFoundException("Users not found"));
         users.remove(userRepository.getById(idUser));
         executor.setUsersExecutors(users);
         executorRepository.save(executor);
@@ -150,8 +150,8 @@ public class MainExecutorService implements ExecutorService  {
 
     @Override
     public int addAlbumToExecutor(int idOfAlbum, int idOfExecutor) {
-        Album album=albumRepository.getAlbumById(idOfAlbum);
-        List<Executor> executors = executorRepository.getAllByExecutorsAlbums(albumRepository.getAlbumById(idOfAlbum));
+        Album album=albumRepository.getAlbumById(idOfAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found"));
+        List<Executor> executors = executorRepository.getAllByExecutorsAlbums(albumRepository.getAlbumById(idOfAlbum).orElseThrow(()-> new EntityNotFoundException("Album not found")));
         executors.add(executorRepository.getById(idOfExecutor));
         album.setAlbumsOFExecutor((List<Executor>) executors);
         albumRepository.save(album);
@@ -186,22 +186,6 @@ public class MainExecutorService implements ExecutorService  {
     public long getCount() {
         return executorRepository.count();
     }
-
-
-
-//    @Override
-//    public int addGenreToExecutor(int idOfExecutor, int... idOfGenre) {
-//        Executor executor = executorRepository.getById(idOfExecutor);
-//        List<Genre> genres= genreRepository.getAllByGenresExecutor(executorRepository.getById(idOfExecutor));
-//        for (int w:
-//             idOfGenre) {
-//            genres.add(genreRepository.getGenreById(w).orElseThrow());
-//        }
-//        executor.setGenresOfExecutors(genres);
-//        executorRepository.save(executor);
-//        return 1;
-//    }
-
 
     public String savePicture(MultipartFile file) throws IOException {
         String resultFilename = null;

@@ -23,7 +23,6 @@ public class PlaylistController {
         builder.setPrettyPrinting();
         Gson gson = builder.create();
         PlaylistData playlistData = gson.fromJson(data, PlaylistData.class);
-        System.out.println(playlistData);
         return ResponseEntity.ok().body( playlistService.createPlaylist(playlistData));
     }
 
@@ -43,14 +42,17 @@ public class PlaylistController {
         builder.setPrettyPrinting();
         Gson gson = builder.create();
         PlaylistData playlistData = gson.fromJson(data, PlaylistData.class);
-        System.out.println("test");
-        System.out.println(playlistData);
         playlistService.updatePlaylist(playlistData);
         return ResponseEntity.ok().body(playlistData);
     }
     @DeleteMapping("playlist")
     public ResponseEntity<Object> deletePlaylist(@RequestParam("id") int id){
-        return  ResponseEntity.ok().body(playlistService.deleteById(id));
+        try{
+            playlistService.deleteById(id);
+        }catch (EntityNotFoundException ex){
+            return ResponseEntity.notFound().build();
+        }
+        return  ResponseEntity.ok().body(1);
     }
 
     @GetMapping("/allPlaylist")
@@ -61,6 +63,7 @@ public class PlaylistController {
 
     @PostMapping("/addPlaylistToUser")
         public ResponseEntity<Object> addPlaylistToUser(@RequestParam("idOfPlaylist") int idOfPlaylist, @RequestParam("loginUser") String loginUser){
+
         return ResponseEntity.ok().body(playlistService.addPlaylistToUser(idOfPlaylist,loginUser));
     }
 }
